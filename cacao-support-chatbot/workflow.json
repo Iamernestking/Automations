@@ -1,0 +1,287 @@
+{
+  "name": "Customer Support Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋 and welcome to Cacao Co.\n\nMy name is Vision, and I am here to help you. To get started, may i know your name, phone number and email address.\n",
+        "options": {
+          "subtitle": "Start a chat. We're here to help you 24/7.",
+          "title": "Ask us anything"
+        }
+      },
+      "id": "4a7c03f5-8a3a-495b-ae40-6af1539e1447",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -192,
+        -16
+      ],
+      "webhookId": "405206e2-2069-4076-8378-cec79f4ba189",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are the customer service assistant for Cacao Co., a cocoa\nmerchant. Today's date is {{ $now }}.\n\nABOUT THE BUSINESS\n- Products: fermented and sun-dried cocoa beans, cocoa nibs,\n  cocoa butter, and cocoa powder.\n- Origins: single-origin lots from named farms.\n- Minimum order: 50 kg for beans, 10 kg for processed products.\n- Export regions: Europe, North America, and within Africa.\n- Pricing: quoted per kilo on request, and depends on grade and\n  volume.\n- Contact: sales@cacao.co (use only if you cannot help).\n\nHOW TO BEHAVE\n- Only answer using the facts above. If you do not know\n  something, say you will connect the customer to a person\n  rather than guessing.\n- Be warm, brief, and professional. Keep answers to a few\n  sentences.\n- If a customer wants a virtual meeting, help them book one\n  using the Book_Meetings tool.\n\nSCHEDULING A MEETING\n- Collect three things first: full name, email, and the day and\n  time they want. Do not book until you have all three.\n- NEVER call the Book_Meetings tool with missing or empty\n  values. If the customer asks for a meeting but has not given\n  a day and time yet, ask them for it in your reply first.\n- Right now it is {{ $now.setZone('Africa/Lagos').format('cccc, dd LLLL yyyy, h:mm a') }} (West Africa Time).\n- Here are the dates of the next 14 days for reference:\n{{ Array.from({length:14}, (_,i)=> $now.setZone('Africa/Lagos').plus({days:i+1}).format('cccc dd LLLL yyyy')).join('; ') }}\n- To find the customer's date, look it up in that list above.\n  Do not calculate it yourself, read it from the list.\n- We meet Monday to Friday only, during office hours 9am to 5pm\n  West Africa Time. We are closed Saturday and Sunday.\n- If the day they picked is a Saturday or Sunday in the list,\n  do not book. Offer the nearest weekdays from the list and let\n  them choose.\n- If the time is outside 9am to 5pm, ask for one within hours.\n- Only when you have a valid weekday within hours: create the\n  event. Start and End must be ISO 8601 timestamps for the exact\n  date you found in the list, End 30 minutes after Start.\n- Add the customer as an attendee, confirm the date and time in\n  words, and share the Google Meet link.\n\nCAPTURING LEADS\n- At the very start of every conversation, before answering any\n  questions, politely say you will take a few quick details\n  first, then collect the customer's full name, phone number,\n  and email.\n- If they decline a detail, ask once more politely, then carry\n  on without it rather than blocking them.\n- Only once you have their details (or they declined twice) and\n  understand what they want, save them once to the leads sheet using the Google Sheets\n  tool. Save only once per conversation.\n- Set the Category field as follows:\n  - \"Serious Lead\" if they do any of these: ask about price,\n    bulk or volume, or placing an order; ask to book a meeting;\n    mention a specific quantity or a timeline; or ask about\n    export to their country or region.\n  - \"Unserious Lead\" for general questions, vague curiosity, or\n    browsing with none of those signals.\n- Always include a short one-line Enquiry summary when saving."
+        }
+      },
+      "id": "e855c1f5-3b4f-426c-b00b-01a710063dc1",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        32,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "id": "ea4ebec2-6079-4e2b-b810-c577674809b6",
+      "name": "Groq Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        192
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "Jx6MIOTfOzmuaC6g",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "id": "55789258-8b2d-4067-b4ee-08cebfe6b136",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        48,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UanL1tvYlcSxCo-NcrUpsesGYFqR9YYJSZeKX7mC4fY",
+          "mode": "list",
+          "cachedResultName": "Leads Capture",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UanL1tvYlcSxCo-NcrUpsesGYFqR9YYJSZeKX7mC4fY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UanL1tvYlcSxCo-NcrUpsesGYFqR9YYJSZeKX7mC4fY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.setZone('Africa/Lagos').toFormat('yyyy-LL-dd HH:mm') }}",
+            "Name": "={{ $fromAI('name', 'customer full name')}}",
+            "Phone": "={{ $fromAI('phone', 'customer phone number') }}",
+            "Email": "={{ $fromAI('email', 'customer email address') }}",
+            "Enquiry": "={{ $fromAI('enquiry', 'one line summary of what the customer wants') }}",
+            "Category": "={{ $fromAI('category', 'either \"Serious Lead\" or \"Unserious Lead\"') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enquiry",
+              "displayName": "Enquiry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2947d08f-1b03-485b-a044-2a7aeef9d360",
+      "name": "Append_leads",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mMCufBmv7rIAP4CI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Creates a 30-minute Google Meet meeting on the Cacao Co. calendar. ONLY call this after the customer has given their full name, email address, and a specific weekday date and time between 9am and 5pm West Africa Time. All three arguments (startTime, attendee0_Attendees, Summary) are required and must never be empty. If any detail is missing, ask the customer for it instead of calling this tool.",
+        "calendar": {
+          "__rl": true,
+          "value": "ernestodelacruz2416@gmail.com",
+          "mode": "list",
+          "cachedResultName": "ernestodelacruz2416@gmail.com"
+        },
+        "start": "={{ $fromAI('startTime', 'meeting start as ISO 8601, e.g. 2026-08-07T14:00:00') }}",
+        "end": "={{ DateTime.fromISO($fromAI('startTime', 'meeting start as ISO 8601, e.g. 2026-08-07T14:00:00')).plus({minutes: 30}).toISO() }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $fromAI('attendee0_Attendees', 'the customer email address to invite, e.g. jane@company.com (required)', 'string') }}"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          },
+          "summary": "={{ $fromAI('Summary', 'meeting title including the customer name and topic, e.g. Cacao Co. x Jane Doe - Export to Ethiopia (required)', 'string') }}"
+        }
+      },
+      "id": "44cba1c9-1ef0-4849-a493-b273cf3ccba5",
+      "name": "Book_Meetings",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        160
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Jc7i8bMVnzUvmrGS",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append_leads": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book_Meetings": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a0667c60-eb45-4f45-87ea-984b93550645",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d11af694b31eccb53cfa039fe268c4443fef773329a1d8d5ac3bf35aefea7092"
+  },
+  "nodeGroups": [],
+  "id": "Wo8YfoWAUDhD4VWH",
+  "tags": []
+}
