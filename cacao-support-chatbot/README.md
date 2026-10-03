@@ -2,6 +2,8 @@
 
 An AI customer support chatbot for **Cacao Co.**, a cocoa merchant. The assistant, named **Vision**, answers customer questions, captures leads into Google Sheets, and books virtual meetings on Google Calendar with a Google Meet link.
 
+![Cacao Co. chatbot workflow](Customer%20assisstance%20on%20n8n.png)
+
 ## What it does
 
 - **Answers questions** about Cacao Co. products (cocoa beans, nibs, butter, powder), origins, minimum orders, and export regions. If it does not know something, it offers to connect the customer to a person instead of guessing.
