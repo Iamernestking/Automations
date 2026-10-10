@@ -2,6 +2,10 @@
 
 An n8n workflow that reads documents from a Google Drive folder, converts them to text, creates embeddings with Google Gemini, and stores them in a Pinecone vector index. This is the ingestion half of a RAG (Retrieval-Augmented Generation) setup: once your documents are in Pinecone, an AI agent can search them to answer questions.
 
+## Workflow preview
+
+![RAG Ingestion workflow](workflow.png)
+
 ## How it works
 
 | Step | Node | Purpose |
