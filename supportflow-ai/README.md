@@ -4,6 +4,8 @@ An n8n workflow that turns customer complaints into tracked support tickets. It 
 
 > Educational demonstration project. It is not an official business support channel.
 
+![SupportFlow AI workflow](SupportflowAI.png)
+
 ## What it does
 
 1. **Intake:** a customer submits a complaint through an n8n form (name, email, optional order number, subject, message).
